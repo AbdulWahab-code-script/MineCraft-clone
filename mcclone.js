@@ -12,6 +12,14 @@ const light = new THREE.DirectionalLight(0xffffff, 1);
 light.position.set(10,20,10);
 scene.add(light);
 
+// ====== Block Types ======
+const BLOCKS = [
+  { id: 0, color: 0x000000 }, // air
+  { id: 1, color: 0x8B4513 }, // dirt
+  { id: 2, color: 0x808080 }, // stone
+  { id: 3, color: 0x00FF00 }  // grass
+];
+
 // ====== World ======
 const worldSize = 16;
 let blocks = [];
@@ -26,7 +34,7 @@ for(let x=0;x<worldSize;x++){
         blocks[x][y][z]=1;
         const cube = new THREE.Mesh(
           new THREE.BoxGeometry(),
-          new THREE.MeshStandardMaterial({color:0x8B4513})
+          new THREE.MeshStandardMaterial({color: BLOCKS[1].color})
         );
         cube.position.set(x,y,z);
         scene.add(cube);
@@ -60,7 +68,11 @@ document.addEventListener("mousemove", e=>{
 });
 
 // ====== Hotbar ======
-let hotbar = Array(9).fill().map(()=>({id:1, count:10}));
+let hotbar = [
+  { id:1, count:10 }, { id:2, count:10 }, { id:3, count:10 },
+  { id:0, count:0 }, { id:0, count:0 }, { id:0, count:0 },
+  { id:0, count:0 }, { id:0, count:0 }, { id:0, count:0 }
+];
 let selectedIndex=0;
 const hotbarDiv=document.getElementById("hotbar");
 
@@ -76,6 +88,14 @@ function renderHotbar(){
   }
 }
 renderHotbar();
+
+// Number keys to switch hotbar
+document.addEventListener("keydown", e=>{
+  if("123456789".includes(e.key)){
+    selectedIndex = parseInt(e.key)-1;
+    renderHotbar();
+  }
+});
 
 // ====== Movement ======
 function updatePlayer(){
@@ -117,14 +137,15 @@ document.addEventListener("mousedown", e=>{
   const block = raycast();
   if(!block) return;
   const pos = block.position;
+
   if(e.button===0){ // left click = break
     scene.remove(block);
     const brokenBlockId = blocks[pos.x][pos.y][pos.z];
 
     let slot = hotbar[selectedIndex];
-    if(slot.id===0 || slot.id===brokenBlockId){
+    if(slot.id === 0 || slot.id === brokenBlockId){
       slot.id = brokenBlockId;
-      slot.count = Math.min(slot.count+1,40);
+      slot.count = Math.min(slot.count+1, 40);
     } else {
       slot.id = brokenBlockId;
       slot.count = 1;
@@ -141,9 +162,10 @@ document.addEventListener("mousedown", e=>{
     const slot = hotbar[selectedIndex];
     if(slot.count<=0) return;
 
+    const blockType = BLOCKS[slot.id];
     const cube = new THREE.Mesh(
       new THREE.BoxGeometry(),
-      new THREE.MeshStandardMaterial({color:0x8B4513})
+      new THREE.MeshStandardMaterial({color: blockType.color})
     );
     cube.position.set(nx,ny,nz);
     scene.add(cube);
@@ -164,3 +186,4 @@ function animate(){
   renderer.render(scene, camera);
 }
 animate();
+
