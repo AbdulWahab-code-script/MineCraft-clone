@@ -1,0 +1,28 @@
+/* make the page clean */
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;   /* no scrollbars */
+  background: #000;   /* fallback while WebGL loads */
+}
+
+/* make the canvas fill the whole screen */
+#gameCanvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  touch-action: none; /* PC-only: ignore touch */
+}
+
+/* optional: tiny hint text if you add it later */
+#hint {
+  position: fixed;
+  left: 12px;
+  bottom: 12px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font: 13px/1.2 system-ui, sans-serif;
+  color: #fff;
+  background: rgba(0,0,0,.5);
+  pointer-events: none;
+}
